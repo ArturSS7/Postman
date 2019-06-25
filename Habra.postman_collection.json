@@ -1,0 +1,208 @@
+{
+	"info": {
+		"_postman_id": "f38ca597-5307-4ccd-8ec4-4b8672011f90",
+		"name": "Habra",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get user id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "246492cc-9307-4c67-a10e-faa8a990b896",
+						"exec": [
+							"",
+							"",
+							"try {",
+							"    // сохраняем userId из json ответа в переменную окружения",
+							"    pm.environment.set(\"userId\", pm.response.json().args.userId);",
+							"} catch(e) {",
+							"    // выводим исключение в консоль",
+							"    console.log(e);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/get?userId={{newUserId}}",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"get"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "{{newUserId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update username",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1ad6eb97-3035-42cd-a377-70a15693f06c",
+						"exec": [
+							"// тестируем статус ответа и формат",
+							"",
+							"",
+							"// проверим, что userId из окружения равен userId из ответа",
+							"pm.test(\"userId from env is equal to userId from response\", function () {",
+							"    pm.expect(parseInt(pm.environment.get(\"userId\"))).to.equal(",
+							"        pm.response.json().data.userId",
+							"    );",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"userId\": {{userId}}, \"username\": \"Lee\"}"
+				},
+				"url": {
+					"raw": "https://postman-echo.com/post",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"post"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Scheme validation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b047b535-f3b2-4336-89b7-b25e43223bf1",
+						"exec": [
+							"// получаем профиль из ответа",
+							"var profile = pm.response.json().data.profile;",
+							"",
+							"// описываем схему модели",
+							"var scheme = {",
+							"    // указываем тип объекта",
+							"    \"type\": \"object\",",
+							"    // указываем обязательные свойства",
+							"    \"required\": [\"userId\", \"username\"],",
+							"    // описываем свойства",
+							"    \"properties\": {",
+							"        \"userId\": {\"type\": \"integer\"},",
+							"        \"username\": {\"type\": \"string\"},",
+							"        \"age\": {\"type\": \"integer\"},",
+							"        // описываем массив",
+							"        \"scores\": {",
+							"            \"type\": \"array\",",
+							"            // тип элементов",
+							"            \"items\": {\"type\": \"integer\"}",
+							"        },",
+							"        // описываем вложенный объект",
+							"        \"rating\": {",
+							"            \"type\": \"object\",",
+							"            \"properties\": {",
+							"                \"min\": {\"type\": \"integer\"},",
+							"                \"max\": {\"type\": \"integer\"}",
+							"            }",
+							"        }",
+							"    }",
+							"};",
+							"",
+							"pm.test('Schema is valid', function() {",
+							"    // валидируем объект profile с помощью правил из scheme",
+							"    var isValidScheme = tv4.validate(profile, scheme, true, true);",
+							"",
+							"    // ожидаем, что результат валидации true",
+							"    pm.expect(isValidScheme).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"profile\" : {\n        \"userId\": {{userId}},\n        \"username\": \"Bob\",\n        \"scores\": [1, 2, 3, 4, 5],\n        \"age\": 21,\n        \"rating\": {\"min\": 20, \"max\": 100}\n    }\n}"
+				},
+				"url": {
+					"raw": "https://postman-echo.com/post",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"post"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "f7a4d77e-63d0-4307-ad30-d0d89f657a87",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "12c8c631-aff4-469d-9740-0a3029a11a79",
+				"type": "text/javascript",
+				"exec": [
+					"pm.test(\"Status is ok, response is json\", function () {",
+					"    pm.response.to.be.ok;",
+					"    pm.response.to.be.json;",
+					"});"
+				]
+			}
+		}
+	]
+}
